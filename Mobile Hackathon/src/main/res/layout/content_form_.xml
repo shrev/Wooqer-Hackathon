@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.example.admin.wooqer_hackathon.Form_Activity"
+    tools:showIn="@layout/activity_form_">
+
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:padding="20px"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:id="@+id/ll_form">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10px"
+                android:layout_marginTop="10px"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="First Name : "
+
+                android:id="@+id/fn" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="110px"
+                android:inputType="textPersonName"
+                android:background="@drawable/text_style"
+                android:ems="10"
+                android:id="@+id/edit_fn"
+                android:hint="Enter First Name" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10px"
+                android:layout_marginTop="10px"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="Last Name : "
+
+                android:id="@+id/ln" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="110px"
+                android:inputType="textPersonName"
+                android:background="@drawable/text_style"
+                android:ems="10"
+                android:id="@+id/edit_ln"
+                android:hint="Enter Last Name" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10px"
+                android:layout_marginTop="10px"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="Secret code : "
+
+                android:id="@+id/sc" />
+
+            <EditText
+                android:layout_width="214dp"
+                android:layout_height="wrap_content"
+                android:editable="false"
+                android:layout_centerInParent="true"
+                android:id="@+id/edit_sc" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10px"
+                android:layout_marginTop="10px"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="Signature : "
+
+                android:id="@+id/sig" />
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/ll_im"></LinearLayout>
+        </LinearLayout>
+
+
+</RelativeLayout>

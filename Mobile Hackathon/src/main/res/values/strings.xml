@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Wooqer _Hackathon</string>
+
+    <string name="title_activity_front_">Front_Activity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="title_activity_front__screen">Front_Screen</string>
+    <string name="title_activity_first_">First_Activity</string>
+    <string name="title_activity_otp_">OTP_Activity</string>
+    <string name="title_activity_form_">Form_Activity</string>
+    <string name="title_activity_report_">Report_Activity</string>
+</resources>
