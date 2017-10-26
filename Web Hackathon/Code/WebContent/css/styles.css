@@ -1,0 +1,23 @@
+a:visited
+{
+	color:black;
+	text-decoration: none;
+}
+a:link
+{
+	color:black;
+	text-decoration: none;
+}
+a:hover
+{
+	cursor:pointer;
+	animation:linker 1s infinite;
+}
+@keyframes linker {
+    0%   {font-size: 50px;}
+    100% {font-size: 50px;}
+}
+body
+{
+	background-repeat: no-repeat;
+}

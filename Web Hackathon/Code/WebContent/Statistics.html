@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>FBI Employee Details</title>
+<link rel="stylesheet" href="css/stats.css">
+<script src="js/Chart.js"></script>
+<script src="js/data.js"></script>
+<style>
+#scroll
+{
+   background-color: #ffffe6;
+   width:100%;
+   height : 100%;
+   display: inline-block;
+	
+}
+.select_style
+{
+    margin-left : 20px;
+	border-radius :10px;
+	width: 180px;
+}
+.div1
+{
+	background-color:#e6ffff;
+	width:100%;
+	height:100%;
+	display: inline-block;
+	
+}
+.innerdiv
+{
+	margin: 20px 10px 10px 30px;
+}
+.container { display: inline-block; }
+</style>
+<script>
+$(function()
+	    {
+	        $('#test').jScrollPane();
+	    });
+</script>
+</head>
+<body style= "margin:50px 50px 50px 50px">
+<h1><u> Employee Statistics </u></h1>
+<br><br>
+
+<table width=100% height=100%>
+<tr>
+<td width=30% height="100%">
+<div class="div1">
+<div class="innerdiv">
+<h4>Employees : </h4>
+<select id ="names" class="select_style" multiple>
+</select>
+<br><br><br>
+<button onclick="getCharts()" style="margin-left:50px">GET CHARTS</button>
+<h4>Attributes :</h4>
+<h5 style="margin-left : 20px">Place</h5>
+<select value="State" id="place" style="margin-left : 40px;width:120px" onchange="getPlaceGraph()">
+</select>
+<h5 style="margin-left : 20px">Gender</h5>
+<select value="Gender" id="gender" style="margin-left : 50px;width:100px" onchange="getGenderGraph()">
+<option value="Male">Male</option>
+<option value="Female">Female</option>
+</select>
+<br><br><br>
+<p id="text"></p>
+</div>
+</div>
+</td>
+<td width=70% height="100%">
+<div class="scroll-pane" id="scroll">
+<div id="inner">
+<h3>Case Count Statistics</h3>
+<canvas id="nocases" style="width:300px;height:200px"></canvas>
+<h3>Average Time Per Case</h3>
+<canvas id="time" style="width:300px;height:200px"></canvas>
+<h3>Performance Meter</h3>
+<canvas id="performance" style="width:300px;height:200px"></canvas>
+<h3>Experience</h3>
+<canvas id="experience" style="width:300px;height:200px"></canvas>
+<h1 style="display:none">No Employee That matches Filters!</h1>
+</div>
+</div>
+</td>
+</tr>
+</table>
+
+
+
+<script type="text/javascript">
+var json = data;
+var root = data['employees'];
+var list = document.getElementById("names");
+var place_list = document.getElementById("place");
+let states=new Set();
+var agents = [];
+var nocases = [];
+var time =[];
+var performance = [];
+var experience =[];
+var bcolors =[];
+
+
+
+
+
+var sum =0;
+var totc=0;
+
+var nmin="";
+var nmax ="";
+var nmaxt ="";
+var nmint = "";
+var nmaxp = "";
+var nminp = "";
+var nmaxe="";
+var nmine = "";
+
+
+var randomColorGenerator = function () { 
+    return '#' + (Math.random().toString(16) + '0000000').slice(2, 8); 
+};
+
+for(var i=0;i<root.length;i++)
+	{
+	  
+	  var name = root[i]['firstName'] + ' ' + root[i]['lastName'];
+	  var scc =root[i]['SolvedCasesCount'];
+	  var atime = root[i]['AverageTimePerCase'];
+	  var exp = scc * atime;
+	  var perf = scc + 1/atime;
+	  var place = root[i]['State'];
+	  
+	  sum = sum +scc;
+	  
+	  
+	  
+	  
+	  performance.push(perf);
+	  experience.push(exp);
+	  nocases.push(scc);
+	  agents.push(name);
+	  time.push(atime);
+	  bcolors.push(randomColorGenerator());
+  
+	  
+	  var opt = document.createElement('option');
+	  opt.innerHTML = name;
+	  opt.value = name;
+	  list.appendChild(opt)
+	  
+	  
+	  if(states.has(place) == false)
+		  {
+		  	states.add(place);
+		  	var opt = document.createElement('option');
+			opt.innerHTML = place;
+			opt.value = place;
+			place_list.appendChild(opt)
+		  }
+	  
+	  
+	  
+	}
+	
+nminp = agents[performance.indexOf(Math.min.apply(null,performance))];
+nmaxp = agents[performance.indexOf(Math.max.apply(null,performance))];
+
+nmine = agents[experience.indexOf(Math.min.apply(null,experience))];
+nmaxe = agents[experience.indexOf(Math.max.apply(null,experience))];
+
+nmin = agents[nocases.indexOf(Math.min.apply(null,nocases))];
+nmax = agents[nocases.indexOf(Math.max.apply(null,nocases))];
+
+nmint = agents[time.indexOf(Math.min.apply(null,time))];
+nmaxt = agents[time.indexOf(Math.max.apply(null,time))];
+place_list.selectedIndex = -1;
+document.getElementById("gender").selectedIndex = -1;
+
+var par = document.getElementById("text");
+par.innerHTML = "<br> Total Number Of Cases Solved : "+sum +"<br> Number Of Agents : "+root.length+"<br> Average Cases Solved Per Agent : "+sum/root.length 
+                 +"<br><br> Maximum Cases Solved By : "+nmax + "<br>Cases Solved The Fastest By : "+nmint +"<br>Best Performance By : "+nmaxp
+                 +"<br> Most Exprienced : "+nmaxe + "<br><br> Least Cases Solved By : "+nmin +"<br> Cases Solved The Slowest By :"+nmaxt +"<br> Least Performance By : "
+                 +nminp+ "<br> Least Experienced :"+nmine;
+
+
+ctx = document.getElementById("nocases").getContext("2d");
+var myChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: agents,
+        datasets: [{
+            label: 'Number of Cases Solved',
+            data: nocases,
+            backgroundColor: bcolors,
+            borderWidth: 1,
+            scaleSteps: 2
+        }]
+    },
+    options: {
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero:true
+                    
+                }
+            }]
+        }
+    }
+});  
+
+ctx2 = document.getElementById("time").getContext("2d");
+var myChart = new Chart(ctx2, {
+    type: 'pie',
+    data: {
+        labels: agents,
+        datasets: [{
+            label: 'Average Investigation Time',
+            data: time,
+            backgroundColor: bcolors
+        }]
+    }
+});
+
+ctx3 = document.getElementById("performance").getContext("2d");
+
+var myChart = new Chart(ctx3, {
+    type: 'bar',
+    data: {
+        labels: agents,
+        datasets: [{
+            label: 'Performance',
+            data: performance,
+            backgroundColor: bcolors,
+            borderWidth: 1,
+            scaleSteps: 2
+        }]
+    },
+    options: {
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero:true
+                    
+                }
+            }]
+        }
+    }
+}); 
+
+ctx4 = document.getElementById("experience").getContext("2d");
+var myChart = new Chart(ctx4, {
+    type: 'pie',
+    data: {
+        labels: agents,
+        datasets: [{
+            label: 'Experience',
+            data: experience,
+            backgroundColor: bcolors
+        }]
+    }
+});
+
+
+
+
+
+
+</script>
+
+<script type ="text/javascript">
+function getGenderGraph()
+{
+let set = new Set();
+genders = document.getElementById("gender");
+if(genders.selectedIndex == -1) return;
+var gval = genders.options[genders.selectedIndex].value;
+var randomColorGenerator = function () { 
+    return '#' + (Math.random().toString(16) + '0000000').slice(2, 8); 
+};
+
+
+
+var agents = [];
+var nocases = [];
+var time =[];
+var performance = [];
+var experience =[];
+var bcolors =[];
+var sum=0;
+var root = data['employees'];
+var nmin="";
+var nmax ="";
+var nmaxt ="";
+var nmint = "";
+var nmaxp = "";
+var nminp = "";
+var nmaxe="";
+var nmine = "";
+
+
+
+
+for(var i=0;i<root.length;i++)
+{
+	
+  
+  var name = root[i]['firstName'] + ' ' + root[i]['lastName'];
+  var scc =root[i]['SolvedCasesCount'];
+  var atime = root[i]['AverageTimePerCase'];
+  var exp = scc * atime;
+  var perf = scc + 1/atime;
+  var place = root[i]['State'];
+  var gender = root[i]['Gender'];
+  
+  if(gval == gender)
+{
+  sum = sum +scc;
+  
+  performance.push(perf);
+  experience.push(exp);
+  nocases.push(scc);
+  agents.push(name);
+  time.push(atime);
+  bcolors.push(randomColorGenerator());
+}
+  
+}
+
+
+nminp = agents[performance.indexOf(Math.min.apply(null,performance))];
+nmaxp = agents[performance.indexOf(Math.max.apply(null,performance))];
+
+nmine = agents[experience.indexOf(Math.min.apply(null,experience))];
+nmaxe = agents[experience.indexOf(Math.max.apply(null,experience))];
+
+nmin = agents[nocases.indexOf(Math.min.apply(null,nocases))];
+nmax = agents[nocases.indexOf(Math.max.apply(null,nocases))];
+
+nmint = agents[time.indexOf(Math.min.apply(null,time))];
+nmaxt = agents[time.indexOf(Math.max.apply(null,time))];
+
+var par = document.getElementById("text");
+par.innerHTML = "<br> Total Number Of Cases Solved : "+sum +"<br> Number Of Agents : "+agents.length+"<br> Average Cases Solved Per Agent : "+Math.round(sum/agents.length) 
+                 +"<br><br> Maximum Cases Solved By : "+nmax + "<br>Cases Solved The Fastest By : "+nmint +"<br>Best Performance By : "+nmaxp
+                 +"<br> Most Exprienced : "+nmaxe + "<br><br> Least Cases Solved By : "+nmin +"<br> Cases Solved The Slowest By :"+nmaxt +"<br> Least Performance By : "
+                 +nminp+ "<br> Least Experienced :"+nmine;
+
+                 
+                 ctx = document.getElementById("nocases").getContext("2d");
+                 var myChart = new Chart(ctx, {
+                     type: 'bar',
+                     data: {
+                         labels: agents,
+                         datasets: [{
+                             label: 'Number of Cases Solved',
+                             data: nocases,
+                             backgroundColor: bcolors,
+                             borderWidth: 1,
+                             scaleSteps: 2
+                         }]
+                     },
+                     options: {
+                         scales: {
+                             yAxes: [{
+                                 ticks: {
+                                     beginAtZero:true
+                                     
+                                 }
+                             }]
+                         }
+                     }
+                 });  
+
+                 ctx2 = document.getElementById("time").getContext("2d");
+                 var myChart = new Chart(ctx2, {
+                     type: 'pie',
+                     data: {
+                         labels: agents,
+                         datasets: [{
+                             label: 'Average Investigation Time',
+                             data: time,
+                             backgroundColor: bcolors
+                         }]
+                     }
+                 });
+
+                 ctx3 = document.getElementById("performance").getContext("2d");
+
+                 var myChart = new Chart(ctx3, {
+                     type: 'bar',
+                     data: {
+                         labels: agents,
+                         datasets: [{
+                             label: 'Performance',
+                             data: performance,
+                             backgroundColor: bcolors,
+                             borderWidth: 1,
+                             scaleSteps: 2
+                         }]
+                     },
+                     options: {
+                         scales: {
+                             yAxes: [{
+                                 ticks: {
+                                     beginAtZero:true
+                                     
+                                 }
+                             }]
+                         }
+                     }
+                 }); 
+
+                 ctx4 = document.getElementById("experience").getContext("2d");
+                 var myChart = new Chart(ctx4, {
+                     type: 'pie',
+                     data: {
+                         labels: agents,
+                         datasets: [{
+                             label: 'Experience',
+                             data: experience,
+                             backgroundColor: bcolors
+                         }]
+                     }
+                 });                 
+                 
+       
+		 
+}
+
+
+</script>
+<script type ="text/javascript">
+function getCharts()
+{
+let set = new Set();
+places = document.getElementById("place");
+var options = list.options;
+var opt;
+var randomColorGenerator = function () { 
+    return '#' + (Math.random().toString(16) + '0000000').slice(2, 8); 
+};
+
+for (var i=0, iLen=options.length; i<iLen; i++) {
+  opt = options[i];
+
+  if (opt.selected) {
+    set.add(opt.value);
+  }
+}
+
+var agents = [];
+var nocases = [];
+var time =[];
+var performance = [];
+var experience =[];
+var bcolors =[];
+var sum=0;
+var root = data['employees'];
+var nmin="";
+var nmax ="";
+var nmaxt ="";
+var nmint = "";
+var nmaxp = "";
+var nminp = "";
+var nmaxe="";
+var nmine = "";
+
+
+
+
+for(var i=0;i<root.length;i++)
+{
+	
+  
+  var name = root[i]['firstName'] + ' ' + root[i]['lastName'];
+  var scc =root[i]['SolvedCasesCount'];
+  var atime = root[i]['AverageTimePerCase'];
+  var exp = scc * atime;
+  var perf = scc + 1/atime;
+  var place = root[i]['State'];
+  var gender = root[i]['Gender'];
+  
+  if(set.has(name))
+{
+  sum = sum +scc;
+  
+  performance.push(perf);
+  experience.push(exp);
+  nocases.push(scc);
+  agents.push(name);
+  time.push(atime);
+  bcolors.push(randomColorGenerator());
+}
+  
+}
+
+
+nminp = agents[performance.indexOf(Math.min.apply(null,performance))];
+nmaxp = agents[performance.indexOf(Math.max.apply(null,performance))];
+
+nmine = agents[experience.indexOf(Math.min.apply(null,experience))];
+nmaxe = agents[experience.indexOf(Math.max.apply(null,experience))];
+
+nmin = agents[nocases.indexOf(Math.min.apply(null,nocases))];
+nmax = agents[nocases.indexOf(Math.max.apply(null,nocases))];
+
+nmint = agents[time.indexOf(Math.min.apply(null,time))];
+nmaxt = agents[time.indexOf(Math.max.apply(null,time))];
+
+var par = document.getElementById("text");
+par.innerHTML = "<br> Total Number Of Cases Solved : "+sum +"<br> Number Of Agents : "+agents.length+"<br> Average Cases Solved Per Agent : "+Math.round(sum/agents.length) 
+                 +"<br><br> Maximum Cases Solved By : "+nmax + "<br>Cases Solved The Fastest By : "+nmint +"<br>Best Performance By : "+nmaxp
+                 +"<br> Most Exprienced : "+nmaxe + "<br><br> Least Cases Solved By : "+nmin +"<br> Cases Solved The Slowest By :"+nmaxt +"<br> Least Performance By : "
+                 +nminp+ "<br> Least Experienced :"+nmine;
+
+                 
+                 ctx = document.getElementById("nocases").getContext("2d");
+                 var myChart = new Chart(ctx, {
+                     type: 'bar',
+                     data: {
+                         labels: agents,
+                         datasets: [{
+                             label: 'Number of Cases Solved',
+                             data: nocases,
+                             backgroundColor: bcolors,
+                             borderWidth: 1,
+                             scaleSteps: 2
+                         }]
+                     },
+                     options: {
+                         scales: {
+                             yAxes: [{
+                                 ticks: {
+                                     beginAtZero:true
+                                     
+                                 }
+                             }]
+                         }
+                     }
+                 });  
+
+                 ctx2 = document.getElementById("time").getContext("2d");
+                 var myChart = new Chart(ctx2, {
+                     type: 'pie',
+                     data: {
+                         labels: agents,
+                         datasets: [{
+                             label: 'Average Investigation Time',
+                             data: time,
+                             backgroundColor: bcolors
+                         }]
+                     }
+                 });
+
+                 ctx3 = document.getElementById("performance").getContext("2d");
+
+                 var myChart = new Chart(ctx3, {
+                     type: 'bar',
+                     data: {
+                         labels: agents,
+                         datasets: [{
+                             label: 'Performance',
+                             data: performance,
+                             backgroundColor: bcolors,
+                             borderWidth: 1,
+                             scaleSteps: 2
+                         }]
+                     },
+                     options: {
+                         scales: {
+                             yAxes: [{
+                                 ticks: {
+                                     beginAtZero:true
+                                     
+                                 }
+                             }]
+                         }
+                     }
+                 }); 
+
+                 ctx4 = document.getElementById("experience").getContext("2d");
+                 var myChart = new Chart(ctx4, {
+                     type: 'pie',
+                     data: {
+                         labels: agents,
+                         datasets: [{
+                             label: 'Experience',
+                             data: experience,
+                             backgroundColor: bcolors
+                         }]
+                     }
+                 });                 
+                 
+                 
+
+	
+		 
+}
+
+</script>
+<script type="text/javascript">
+function getPlaceGraph()
+{
+let set = new Set();
+places = document.getElementById("place");
+if(places.selectedIndex == -1) return;
+var pval = places.options[places.selectedIndex].value;
+var randomColorGenerator = function () { 
+    return '#' + (Math.random().toString(16) + '0000000').slice(2, 8); 
+};
+
+
+
+var agents = [];
+var nocases = [];
+var time =[];
+var performance = [];
+var experience =[];
+var bcolors =[];
+var sum=0;
+var root = data['employees'];
+var nmin="";
+var nmax ="";
+var nmaxt ="";
+var nmint = "";
+var nmaxp = "";
+var nminp = "";
+var nmaxe="";
+var nmine = "";
+
+
+
+
+for(var i=0;i<root.length;i++)
+{
+	
+  
+  var name = root[i]['firstName'] + ' ' + root[i]['lastName'];
+  var scc =root[i]['SolvedCasesCount'];
+  var atime = root[i]['AverageTimePerCase'];
+  var exp = scc * atime;
+  var perf = scc + 1/atime;
+  var place = root[i]['State'];
+  var gender = root[i]['Gender'];
+  
+  if(pval == place)
+{
+  sum = sum +scc;
+  
+  performance.push(perf);
+  experience.push(exp);
+  nocases.push(scc);
+  agents.push(name);
+  time.push(atime);
+  bcolors.push(randomColorGenerator());
+}
+  
+}
+
+
+nminp = agents[performance.indexOf(Math.min.apply(null,performance))];
+nmaxp = agents[performance.indexOf(Math.max.apply(null,performance))];
+
+nmine = agents[experience.indexOf(Math.min.apply(null,experience))];
+nmaxe = agents[experience.indexOf(Math.max.apply(null,experience))];
+
+nmin = agents[nocases.indexOf(Math.min.apply(null,nocases))];
+nmax = agents[nocases.indexOf(Math.max.apply(null,nocases))];
+
+nmint = agents[time.indexOf(Math.min.apply(null,time))];
+nmaxt = agents[time.indexOf(Math.max.apply(null,time))];
+
+var par = document.getElementById("text");
+par.innerHTML = "<br> Total Number Of Cases Solved : "+sum +"<br> Number Of Agents : "+agents.length+"<br> Average Cases Solved Per Agent : "+Math.round(sum/agents.length) 
+                 +"<br><br> Maximum Cases Solved By : "+nmax + "<br>Cases Solved The Fastest By : "+nmint +"<br>Best Performance By : "+nmaxp
+                 +"<br> Most Exprienced : "+nmaxe + "<br><br> Least Cases Solved By : "+nmin +"<br> Cases Solved The Slowest By :"+nmaxt +"<br> Least Performance By : "
+                 +nminp+ "<br> Least Experienced :"+nmine;
+
+
+                 ctx = document.getElementById("nocases").getContext("2d");
+                 var myChart = new Chart(ctx, {
+                     type: 'bar',
+                     data: {
+                         labels: agents,
+                         datasets: [{
+                             label: 'Number of Cases Solved',
+                             data: nocases,
+                             backgroundColor: bcolors,
+                             borderWidth: 1,
+                             scaleSteps: 2
+                         }]
+                     },
+                     options: {
+                         scales: {
+                             yAxes: [{
+                                 ticks: {
+                                     beginAtZero:true
+                                     
+                                 }
+                             }]
+                         }
+                     }
+                 });  
+
+                 ctx2 = document.getElementById("time").getContext("2d");
+                 var myChart = new Chart(ctx2, {
+                     type: 'pie',
+                     data: {
+                         labels: agents,
+                         datasets: [{
+                             label: 'Average Investigation Time',
+                             data: time,
+                             backgroundColor: bcolors
+                         }]
+                     }
+                 });
+
+                 ctx3 = document.getElementById("performance").getContext("2d");
+
+                 var myChart = new Chart(ctx3, {
+                     type: 'bar',
+                     data: {
+                         labels: agents,
+                         datasets: [{
+                             label: 'Performance',
+                             data: performance,
+                             backgroundColor: bcolors,
+                             borderWidth: 1,
+                             scaleSteps: 2
+                         }]
+                     },
+                     options: {
+                         scales: {
+                             yAxes: [{
+                                 ticks: {
+                                     beginAtZero:true
+                                     
+                                 }
+                             }]
+                         }
+                     }
+                 }); 
+
+                 ctx4 = document.getElementById("experience").getContext("2d");
+                 var myChart = new Chart(ctx4, {
+                     type: 'pie',
+                     data: {
+                         labels: agents,
+                         datasets: [{
+                             label: 'Experience',
+                             data: experience,
+                             backgroundColor: bcolors
+                         }]
+                     }
+                 });                 
+                 
+                 
+
+	
+		 
+}
+</script>
+</body>
+</html>
